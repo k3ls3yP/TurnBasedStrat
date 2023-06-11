@@ -87,7 +87,6 @@ public class CameraController : MonoBehaviour
 
         targetFollowOffset.y = Mathf.Clamp(targetFollowOffset.y, MIN_FOLLOW_Y_OFFSET, MAX_FOLLOW_Y_OFFSET);
 
-        float zoomSpeed = 5f;
         cinemachineTransposer.m_FollowOffset =
             Vector3.Lerp(cinemachineTransposer.m_FollowOffset, targetFollowOffset, Time.deltaTime * zoomSpeed);
 
