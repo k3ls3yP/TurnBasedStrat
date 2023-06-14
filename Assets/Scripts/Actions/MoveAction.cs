@@ -1,43 +1,54 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveAction : MonoBehaviour
+public class MoveAction : BaseAction
 {
     private Vector3 targetPos;
     [SerializeField] private Animator unitAnimator;
     [SerializeField] private int maxMoveDistance = 4;
-    private Unit unit;
 
-    private void Awake() {
-        unit = GetComponent<Unit>();
+
+    protected override void Awake() {
+        base.Awake();
         targetPos = transform.position;
     }
     
     private void Update() 
     {
+        if(!isActive)
+        {
+            return;
+        }
+        Vector3 moveDirection = (targetPos - transform.position).normalized;
         float stoppingDistance = .1f;
         Vector3 currentPos = transform.position;
         if (Vector3.Distance(currentPos, targetPos) > stoppingDistance)
             {
-                Vector3 moveDirection = (targetPos - transform.position).normalized;
+                
                 float moveSpeed = 4f;  
                 transform.position += moveDirection * moveSpeed * Time.deltaTime;
 
-                float rotateSpeed = 10f;
-
-                transform.forward = Vector3.Lerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
                 
                 unitAnimator.SetBool("isWalking", true);
             }
         else
         {
+            isActive = false;
             unitAnimator.SetBool("isWalking", false);
+            onActionComplete();
         }
+        
+        float rotateSpeed = 10f;
+        transform.forward = Vector3.Lerp(transform.forward, moveDirection, rotateSpeed * Time.deltaTime);
     }
-    public void Move(GridPosition gridPosition)
+    public void Move(GridPosition gridPosition, Action onActionComplete)
     {
-        this.targetPos = LevelGrid.Instance.GetWorldPosition(gridPosition);;
+        this.onActionComplete = onActionComplete;
+        this.targetPos = LevelGrid.Instance.GetWorldPosition(gridPosition);
+        isActive = true;
+
     }
 
     public bool IsValidActionGridPosition(GridPosition gridPosition)
